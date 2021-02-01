@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 映射文件 -->
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 和绑定的接口全类名对应 -->
+<mapper namespace="com.zyy.dao.StudentDao">
+<!-- id 和 接口方法名相同 
+	resultType 返回结果集
+	parameterType 返回参数类型
+	mysql中字段的名称和javabean类中的属性名称全部一样数据类型一样 
+	mybatis才能自动装好数据 这就叫自动装配
+-->
+	<select id="findStudentAll"  resultType="com.zyy.bean.Student">
+		SELECT * FROM ss
+	</select>
+	<!-- 以前的占位符是？ 但是现在我们用#{  }
+		且{ }里需要取一个名字 只是一个标识符 一般和前面一样
+	 -->
+	<select id="findOneStudent" parameterType="int" resultType="com.zyy.bean.Student">
+		SELECT * FROM ss WHERE id = #{ id }
+	</select>
+	<!-- 传入类型是对像 就传入全类名 
+			而且不需要添加结果集 会直接返回一个数字
+			传入类型为对象时 #{ 这里面只能写对象的属性名称}
+	-->
+	<insert id="addStudent" parameterType="com.zyy.bean.Student">
+		INSERT INTO ss (name,age,sex,time) VALUE(#{name},#{age},#{sex},#{time})
+	</insert>
+	<!--虽然 添加删除修改都不允许写返回结果集属性
+		但是 都有默认的返回值就是执行sql语句的记录行数
+	 -->
+	<update id="updateStudent" parameterType="com.zyy.bean.Student" >
+		UPDATE ss SET name=#{name},age=#{age},sex=#{sex},time=#{time} WHERE id=#{id}
+	</update>
+	<!-- 如果只传一个参数 且是基本数据类型
+		parameterType 可以不写
+	 -->
+	<delete id="delStudent" >
+		DELETE FROM ss WHERE id=#{id}
+	</delete>
+	
+	<!-- 模糊查询
+		本来应该这样写的：SELECTE * FROM ss WHERE name LIKE "%#{name}%"
+	 	但是#{}只是占位符 当我们需要%拼接一个字符串%
+	 	所以我们这里要用拼接符 就是：${ }
+	 	如果使用了拼接符 且传入参数是string类型的 花括号里必须写 value
+	 -->
+	<select id="findLikeByName" parameterType="string" resultType="com.zyy.bean.Student">
+		SELECT * FROM ss WHERE name LIKE "%${value}%"
+	</select>
+	<!-- 动态sql -->
+	<!-- 按不同的条件查询  -->
+	<select id="findStudentBySearch" parameterType="com.zyy.bean.Student" resultType="com.zyy.bean.Student">
+		SELECT * FROM ss
+		<!-- where 标签就是用来替代关键字where的 要想关键字存在 要用if判断 -->
+		<where>
+			<if test="name!=null">
+			<!-- 但是我们使用名字查询的时候 一般用模糊查询
+			这里传入的是对象 所以模糊查询定义姓名的时候 要传属性名
+				name = #{name}-->
+				name like "%${name}%"
+			</if>
+			<if test="age!=null">
+				AND age = #{age}
+			</if>
+		</where>
+	</select>
+	<!-- 注解版本 按id删除数据  
+	使用注解后，不用写传入参数属性类型
+	按照以前学的来说：DELETE FROM ss WHERE id in(3,6)
+	但是不可能用占位符了 要用fore来循环遍历集合 得到结果集来完成删除
+	-->	
+	<delete id="delStudentById">
+		DELETE FROM ss
+		<where>
+		<!-- 集合ids不等于null，集合元素个数大于0 是才能得到结果集删除 -->
+			<if test="ids!=null and ids.size>0">
+			<!--collection:你要遍历的集合
+				item：循环后对象
+				open：循环开始前
+				close：循环结束后
+				separator：步长 每次迭代用什么分割
+			  -->
+				<foreach collection="ids"
+					item="id"
+					open="id in("  
+					close=")"
+					separator=",">
+					#{id}
+				</foreach>
+			</if>
+		</where>
+	</delete>
+	<!-- sql片段 一些公共的功能 就行java封装方法一样 -->
+	<sql id="pianduan"></sql>
+	<!-- 调用就是用includ标签调用这个片段 传入片段id就行了 -->
+	<insert id="add*">
+		<include refid="pianduan"></include>
+	</insert>
+</mapper>
