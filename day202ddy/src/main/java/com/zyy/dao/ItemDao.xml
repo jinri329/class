@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 映射文件 -->
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyy.dao.ItemDao">
+ <!-- 多对一关系 -->
+ <resultMap type="com.zyy.bean.TbItemParamKey" id="keys">
+ 	<id column="paramId" property="id"></id>
+ 	<result column="paramName" property="paramName"/>
+ 	<association property="group" javaType="com.zyy.bean.TbItemParamGroup">
+ 		<id column="id" property="id"></id>
+ 	 	<result column="groupName" property="groupName"/>
+ 	 	<result column="itemCatId" property="itemCatId"/>
+ 	</association>
+ </resultMap>
+	<select id="findParamKeyById" parameterType="int" resultMap="keys">
+		SELECT a.id,a.groupName,a.itemCatId,b.id paramId,b.paramName FROM tbitemparamgroup AS a
+		INNER JOIN tbitemparamkey AS b ON a.id = b.groupId
+		<where>
+				b.id = #{id}
+		</where>
+	</select>
+
+
+
+
+</mapper>
+   
