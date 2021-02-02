@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 映射文件 -->
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyy.dao.ItemDao">
+<!-- 
+	以前的resultType 叫做自动映射 只要表中字段和属性一一对应就能映射上
+	现在需要手动映射 有我们确定映射关系
+ -->
+ <!-- 一对多关系 -->
+ <resultMap type="com.zyy.bean.TbItemParamGroup" id="groups">
+ <!--程序员自己决定查询出来的字段映射到类中哪个属性去 
+ column 表示查询出的字段
+ property 表示映射到哪个属性去
+ 
+ 主键一定要用id标签 其他用result标签
+ -->
+ 	<id column="id" property="id"></id>
+ 	<result column="groupName" property="groupName"/>
+ 	<result column="itemCatId" property="itemCatId"/>
+ 	<!-- 这是组里面的值已经转载完了 但是另一个属性是一个类 
+ 	属性是类 用collection标签
+ 	property 返回属性
+ 	ofType 返回数据类型
+ 	-->
+ 	<collection property="paramKey" ofType="com.zyy.bean.TbItemParamKey">
+ 		<id column="paramId" property="id"></id>
+ 	 	<result column="paramName" property="paramName"/>
+ 	 	<!--  <collection property="paramValue" ofType="com.zyy.bean.TbItemParamValue">
+ 	 		<id column="itemId" property="itemId"></id>
+ 	 		<result column="paramId" property="paramId"/>
+ 	 		<result column="paramValue" property="paramValue"/>
+ 	 	</collection>-->
+ 	</collection>
+ </resultMap>
+	<select id="findItemById" parameterType="int" resultMap="groups">
+		SELECT a.id,a.groupName,a.itemCatId,b.id paramId,b.paramName FROM tbitemparamgroup AS a
+		INNER JOIN tbitemparamkey AS b ON a.id = b.groupId
+		<where>
+				a.id = #{id}
+		</where>
+	</select>
+
+
+
+
+</mapper>
+   
