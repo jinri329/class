@@ -8,6 +8,8 @@ public class PicUtils {
 		String string = UUID.randomUUID().toString();
 		String startName = string.replaceAll("-", "");
 		String endName = name.substring(name.lastIndexOf("."));
+		
+		System.out.println("aaa");
 		return startName+endName;
 		
 	}

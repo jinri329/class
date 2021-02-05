@@ -16,4 +16,8 @@
 	<update id="updateitem" parameterType="com.zyy.bean.Items">
 		UPDATE items SET name=#{name},price=#{price},detail=#{detail},createtime=#{createtime},pic=#{pic} WHERE id = #{id}
 	</update>
+	
+	<select id="checkData" parameterType="string" resultType="com.zyy.bean.Items">
+		SELECT * FROM items WHERE name=#{name}
+	</select>
 </mapper>

@@ -12,4 +12,6 @@ public interface ItemDao {
 	Items findById(Integer id);
 
 	int updateitem(Items items);
+
+	Items checkData(String username);
 }

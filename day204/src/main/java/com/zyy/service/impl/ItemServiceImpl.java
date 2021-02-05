@@ -11,9 +11,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.zyy.bean.Items;
+import com.zyy.bean.User;
 import com.zyy.dao.ItemDao;
 import com.zyy.service.ItemService;
 import com.zyy.utils.PicUtils;
+import com.zyy.vo.ItemResult;
 
 @Service
 public class ItemServiceImpl implements ItemService {
@@ -31,11 +33,10 @@ public class ItemServiceImpl implements ItemService {
 	}
 	@Override
 	public int updateitem(Items items,MultipartFile picFile) {
-		items.setCreatetime(new Date());
 		//将图片存入服务器
-		
 		//获取图片名称且改造名字
-		String filename = PicUtils.getPicName(picFile.getOriginalFilename());
+		String name = picFile.getOriginalFilename();
+		String filename = PicUtils.getPicName(name);
 		//获取时间
 		SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
 		String time = format.format(new Date());
@@ -58,6 +59,14 @@ public class ItemServiceImpl implements ItemService {
 		}
 		//错误就返回0
 		return 0;
+	}
+	@Override
+	public ItemResult checkData(User user) {
+		Items items=itemDao.checkData(user.getUsername());
+		if(items==null) {
+			return ItemResult.ok("用户名可用");
+		}
+		return ItemResult.build(500, "no", "用户名不可用");
 	}
 
 }
